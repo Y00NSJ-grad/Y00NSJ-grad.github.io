@@ -1,4 +1,4 @@
 User-agent: *
 Disallow:
 
-Sitemap: https://ysj.github.io/sitemap.xml
+Sitemap: https://Y00NSJ-grad.github.io/sitemap.xml
