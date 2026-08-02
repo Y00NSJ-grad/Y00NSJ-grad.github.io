@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
     maxZoom: 2.5,
     wheelSensitivity: 0.18,
 
-    // Cola를 별도로 시작하기 전에 임시 위치를 생성합니다.
+    // Cola 레이아웃을 시작하기 전 임시 위치를 생성합니다.
     layout: {
       name: "random",
       fit: false,
@@ -214,72 +214,137 @@ document.addEventListener("DOMContentLoaded", () => {
   ).matches;
 
   let physicsLayout;
+  let stopTimer;
   let initialFit = true;
 
-  function startPhysics(randomize = false) {
+  /*
+   * 공통 Cola 레이아웃 옵션입니다.
+   *
+   * 평상시에는 물리 엔진을 중단하고,
+   * 사용자가 노드를 드래그할 때만 무한 실행합니다.
+   */
+  const physicsOptions = {
+    name: "cola",
+    animate: true,
+    fit: false,
+    padding: 45,
+
+    avoidOverlap: true,
+    handleDisconnected: true,
+
+    // 라벨은 대부분 숨겨져 있으므로 충돌 계산에서 제외합니다.
+    nodeDimensionsIncludeLabels: false,
+
+    refresh: 1,
+    convergenceThreshold: 0.01,
+
+    // 드래그 중 viewport가 움직이지 않도록 합니다.
+    centerGraph: false,
+
+    // 물리 시뮬레이션 도중에도 노드를 드래그할 수 있게 합니다.
+    ungrabifyWhileSimulating: false,
+
+    nodeSpacing: (node) => {
+      if (node.hasClass("root-node")) {
+        return 24;
+      }
+
+      if (node.hasClass("category-node")) {
+        return 16;
+      }
+
+      return 8;
+    },
+
+    edgeLength: (edge) => {
+      const connectedNodes = edge.connectedNodes();
+
+      if (connectedNodes.filter(".root-node").length > 0) {
+        return 125;
+      }
+
+      if (connectedNodes.filter(".category-node").length > 0) {
+        return 95;
+      }
+
+      return 70;
+    },
+  };
+
+  function runPhysics({
+    infinite = false,
+    maxSimulationTime = 1200,
+    randomize = false,
+  } = {}) {
     physicsLayout?.stop();
 
-    physicsLayout = cy.layout({
-      name: "cola",
+    const shouldRunInfinitely = infinite && !prefersReducedMotion;
 
-      // reduced-motion 사용자는 무한 애니메이션을 끕니다.
-      infinite: !prefersReducedMotion,
-      animate: true,
-
-      // infinite 모드에서는 계속 fit하면 화면이 튈 수 있으므로 false
-      fit: false,
-      padding: 45,
-
+    const layoutOptions = {
+      ...physicsOptions,
+      infinite: shouldRunInfinitely,
       randomize,
-      avoidOverlap: true,
-      handleDisconnected: true,
 
-      // 라벨 크기까지 충돌 검사에 포함
-      nodeDimensionsIncludeLabels: true,
-
-      nodeSpacing: (node) => {
-        if (node.hasClass("root-node")) {
-          return 28;
-        }
-
-        if (node.hasClass("category-node")) {
-          return 20;
-        }
-
-        return 12;
-      },
-
-      edgeLength: (edge) => {
-        const connectedNodes = edge.connectedNodes();
-
-        if (connectedNodes.filter(".root-node").length > 0) {
-          return 135;
-        }
-
-        if (connectedNodes.filter(".category-node").length > 0) {
-          return 105;
-        }
-
-        return 80;
-      },
-
-      refresh: 1,
-      convergenceThreshold: 0.001,
-      ungrabifyWhileSimulating: false,
-      centerGraph: true,
-
-      ready: () => {
+      stop: () => {
+        /*
+         * 최초 로딩과 Reset 시에만 그래프 전체가 보이도록 맞춥니다.
+         * 드래그 후에는 viewport를 변경하지 않습니다.
+         */
         if (initialFit) {
           cy.fit(undefined, 45);
           initialFit = false;
         }
       },
-    });
+    };
 
+    /*
+     * infinite 모드가 아닌 경우에만 실행 시간 제한을 설정합니다.
+     */
+    if (!shouldRunInfinitely) {
+      layoutOptions.maxSimulationTime = maxSimulationTime;
+    }
+
+    physicsLayout = cy.layout(layoutOptions);
     physicsLayout.run();
   }
 
-  startPhysics(false);
+  /*
+   * 최초 페이지 로딩:
+   * 약 1.2초 동안만 배치한 뒤 물리 엔진을 정지합니다.
+   */
+  runPhysics({
+    infinite: false,
+    maxSimulationTime: 1200,
+    randomize: false,
+  });
+
+  /*
+   * 노드를 잡으면 물리 엔진을 켭니다.
+   * 연결된 노드들이 용수철처럼 반응합니다.
+   */
+  cy.on("grab", "node", () => {
+    window.clearTimeout(stopTimer);
+
+    if (prefersReducedMotion) {
+      return;
+    }
+
+    runPhysics({
+      infinite: true,
+      randomize: false,
+    });
+  });
+
+  /*
+   * 노드를 놓은 후 700ms 동안 흔들리게 한 뒤 물리 엔진을 정지합니다.
+   */
+  cy.on("free", "node", () => {
+    window.clearTimeout(stopTimer);
+
+    stopTimer = window.setTimeout(() => {
+      physicsLayout?.stop();
+    }, 700);
+  });
 
   /*
    * 세부 노드는 hover할 때만 라벨을 표시합니다.
@@ -399,24 +464,37 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /*
-   * 탭을 벗어나면 물리 연산을 중단해 CPU 사용량을 줄입니다.
+   * 탭을 벗어나면 물리 연산과 예약된 정지를 모두 중단합니다.
+   * 탭으로 돌아왔을 때 자동으로 재실행하지는 않습니다.
    */
   document.addEventListener("visibilitychange", () => {
-    if (document.hidden) {
-      physicsLayout?.stop();
-    } else {
-      startPhysics(false);
+    if (!document.hidden) {
+      return;
     }
+
+    window.clearTimeout(stopTimer);
+    physicsLayout?.stop();
   });
 
+  /*
+   * Reset:
+   * 노드 위치를 다시 무작위화하고 약 1.2초 동안 재배치합니다.
+   */
   document
     .getElementById("interest-graph-reset")
     ?.addEventListener("click", () => {
+      window.clearTimeout(stopTimer);
+
       cy.elements().unselect();
       cy.elements().removeClass("faded highlighted");
 
       initialFit = true;
-      startPhysics(true);
+
+      runPhysics({
+        infinite: false,
+        maxSimulationTime: 1200,
+        randomize: true,
+      });
 
       if (description) {
         description.textContent = "Select a node to view its description.";

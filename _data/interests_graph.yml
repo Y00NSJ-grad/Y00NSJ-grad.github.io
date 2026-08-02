@@ -455,135 +455,135 @@ edges:
       source: optimization-theory
       target: qubo
 
-  # Cross-category relationships
-  - data:
-      source: marl
-      target: game-theory
+  # # Cross-category relationships
+  # - data:
+  #     source: marl
+  #     target: game-theory
 
-  - data:
-      source: marl
-      target: uav-assisted-mec
+  # - data:
+  #     source: marl
+  #     target: uav-assisted-mec
 
-  - data:
-      source: marl
-      target: uav-trajectory-control
+  # - data:
+  #     source: marl
+  #     target: uav-trajectory-control
 
-  - data:
-      source: qrl
-      target: rl
+  # - data:
+  #     source: qrl
+  #     target: rl
 
-  - data:
-      source: qrl
-      target: marl
+  # - data:
+  #     source: qrl
+  #     target: marl
 
-  - data:
-      source: qml
-      target: qubo
+  # - data:
+  #     source: qml
+  #     target: qubo
 
-  - data:
-      source: qfl
-      target: qml
+  # - data:
+  #     source: qfl
+  #     target: qml
 
-  - data:
-      source: uav-assisted-mec
-      target: mec
+  # - data:
+  #     source: uav-assisted-mec
+  #     target: mec
 
-  - data:
-      source: uav-assisted-mec
-      target: iscc
+  # - data:
+  #     source: uav-assisted-mec
+  #     target: iscc
 
-  - data:
-      source: uav-trajectory-control
-      target: lyapunov-optimization
+  # - data:
+  #     source: uav-trajectory-control
+  #     target: lyapunov-optimization
 
-  - data:
-      source: uav-trajectory-control
-      target: sca
+  # - data:
+  #     source: uav-trajectory-control
+  #     target: sca
 
-  - data:
-      source: mec
-      target: edge-caching
+  # - data:
+  #     source: mec
+  #     target: edge-caching
 
-  - data:
-      source: mec
-      target: urllc
+  # - data:
+  #     source: mec
+  #     target: urllc
 
-  - data:
-      source: mec
-      target: iscc
+  # - data:
+  #     source: mec
+  #     target: iscc
 
-  - data:
-      source: sagin
-      target: ntn
+  # - data:
+  #     source: sagin
+  #     target: ntn
 
-  - data:
-      source: sagin
-      target: satellite-communications
+  # - data:
+  #     source: sagin
+  #     target: satellite-communications
 
-  - data:
-      source: sagin
-      target: uav-systems
+  # - data:
+  #     source: sagin
+  #     target: uav-systems
 
-  - data:
-      source: sagsin
-      target: sagin
+  # - data:
+  #     source: sagsin
+  #     target: sagin
 
-  - data:
-      source: ntn
-      target: leo-satellites
+  # - data:
+  #     source: ntn
+  #     target: leo-satellites
 
-  - data:
-      source: ntn
-      target: meo-satellites
+  # - data:
+  #     source: ntn
+  #     target: meo-satellites
 
-  - data:
-      source: ntn
-      target: geo-satellites
+  # - data:
+  #     source: ntn
+  #     target: geo-satellites
 
-  - data:
-      source: satellite-routing
-      target: gnn
+  # - data:
+  #     source: satellite-routing
+  #     target: gnn
 
-  - data:
-      source: satellite-handover
-      target: rl
+  # - data:
+  #     source: satellite-handover
+  #     target: rl
 
-  - data:
-      source: generative-ai
-      target: diffusion-models
+  # - data:
+  #     source: generative-ai
+  #     target: diffusion-models
 
-  - data:
-      source: physical-ai
-      target: vla
+  # - data:
+  #     source: physical-ai
+  #     target: vla
 
-  - data:
-      source: physical-ai
-      target: digital-twins
+  # - data:
+  #     source: physical-ai
+  #     target: digital-twins
 
-  - data:
-      source: physical-ai
-      target: world-model
+  # - data:
+  #     source: physical-ai
+  #     target: world-model
 
-  - data:
-      source: world-model
-      target: rl
+  # - data:
+  #     source: world-model
+  #     target: rl
 
-  - data:
-      source: digital-twins
-      target: uav-systems
+  # - data:
+  #     source: digital-twins
+  #     target: uav-systems
 
-  - data:
-      source: lyapunov-optimization
-      target: mec
+  # - data:
+  #     source: lyapunov-optimization
+  #     target: mec
 
-  - data:
-      source: lagrangian-optimization
-      target: mec
+  # - data:
+  #     source: lagrangian-optimization
+  #     target: mec
 
-  - data:
-      source: auction-based-optimization
-      target: edge-caching
+  # - data:
+  #     source: auction-based-optimization
+  #     target: edge-caching
 
-  - data:
-      source: sca
-      target: iscc
+  # - data:
+  #     source: sca
+  #     target: iscc
