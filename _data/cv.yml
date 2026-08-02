@@ -12,12 +12,12 @@ cv:
     # - network: LinkedIn
     #   username: example
 
-  location:
-    street: 100, Cheongpa-ro 47-gil
-    city: Yongsan-gu
-    region: Seoul
-    postalCode: 04310
-    countryCode: South Korea
+  # location:
+  #   street: 100, Cheongpa-ro 47-gil
+  #   city: Yongsan-gu
+  #   region: Seoul
+  #   postalCode: 04310
+  #   countryCode: South Korea
 
   sections:
     Education:
@@ -26,9 +26,8 @@ cv:
         area: Computer Science
         studyType: PhD
         start_date: 2026
-        end_date: 
-        highlights:
-
+        # end_date:
+        # highlights:
 
       - institution: Sookmyung Women's University
         location: Seoul, South Korea
@@ -109,18 +108,18 @@ cv:
           - Seojin Yoon
           - Soohyun Park
         publisher: 2026 IEEE International Conference on Quantum Computing and Engineering (QCE)
-        releaseDate: 2026-00-00
+        releaseDate: 2026-09-18
         # url: TBD
-        summary: 
+        # summary:
 
       - title: Lyapunov-Guided DRL for Energy-Efficient and Low-Latency Control of Multi-UAV MEC in IIoT
         authors:
           - Seojin Yoon
           - Soohyun Park
         publisher: 2026 IEEE 104th Vehicular Technology Conference (VTC2026-Fall)
-        releaseDate: 2026-00-00
+        releaseDate: 2026-09-09
         # url: TBD
-        summary: 
+        # summary:
 
       - title: 강화학습 기반 고급 AI 융합 UAV 궤적·전력·빔포밍 최적화 동향 및 공동 최적화 제안
         authors:
@@ -129,13 +128,13 @@ cv:
         publisher: 2025 대한전자공학회 추계학술대회
         releaseDate: 2025-11-30
         url: https://www.dbpia.co.kr/journal/articleDetail?nodeId=NODE12551326
-        summary: 
+        summary:
 
     # Skills:
     #   - name: Physics
-        level: Master
-        icon: fa-solid fa-hashtag
-        keywords: "Quantum Mechanics, Quantum Computing, Quantum Information, Quantum Cryptography, Quantum Communication, Quantum Teleportation"
+    # level: Master
+    # icon: fa-solid fa-hashtag
+    # keywords: "Quantum Mechanics, Quantum Computing, Quantum Information, Quantum Cryptography, Quantum Communication, Quantum Teleportation"
 
     # Languages:
     #   - name: German
