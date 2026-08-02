@@ -77,8 +77,8 @@ document.addEventListener("DOMContentLoaded", () => {
       {
         selector: "node.root-node",
         style: {
-          width: 46,
-          height: 46,
+          width: 55,
+          height: 55,
 
           label: "data(label)",
 
