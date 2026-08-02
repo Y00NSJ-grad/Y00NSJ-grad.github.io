@@ -1,0 +1,37 @@
+---
+# Only the main Sass file needs front matter
+---
+
+@charset "utf-8";
+
+@use "sass:math";
+@use "sass:string";
+
+/*
+ * Theme color configuration
+ *
+ * $purple-color: light mode accent color
+ * $cyan-color:   dark mode accent color
+ */
+@use "variables" with (
+  $max-content-width: {{ site.max_width | default: "930px" }},
+  $purple-color: #2261ff,
+  $cyan-color: #6c8eff
+);
+
+@use "themes";
+@use "layout";
+
+// Core styles
+@use "typography";
+@use "navbar";
+@use "footer";
+@use "blog";
+@use "publications";
+@use "components";
+@use "utilities";
+
+// Specialized styles
+@use "tabs";
+@use "teachings";
+@use "typograms";
