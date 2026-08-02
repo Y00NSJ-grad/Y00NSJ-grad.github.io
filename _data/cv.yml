@@ -32,6 +32,7 @@ cv:
       - institution: Sookmyung Women's University
         location: Seoul, South Korea
         area: Computer Science
+        studyType: BS
         start_date: 2019
         end_date: 2026
         highlights:
