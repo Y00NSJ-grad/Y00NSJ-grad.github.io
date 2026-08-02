@@ -14,6 +14,12 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
+  /*
+   * 최초 렌더링 시 random/cola 중간 상태가 보이지 않도록 숨깁니다.
+   * Cola 배치와 fit이 모두 끝난 뒤 그래프를 표시합니다.
+   */
+  container.style.visibility = "hidden";
+
   const cy = cytoscape({
     container,
 
@@ -23,7 +29,10 @@ document.addEventListener("DOMContentLoaded", () => {
     maxZoom: 2.5,
     wheelSensitivity: 0.18,
 
-    // Cola 레이아웃을 시작하기 전 임시 위치를 생성합니다.
+    /*
+     * Cytoscape 생성 시 임시 위치만 만듭니다.
+     * fit은 Cola 레이아웃이 끝난 뒤 한 번만 수행합니다.
+     */
     layout: {
       name: "random",
       fit: false,
@@ -47,6 +56,8 @@ document.addEventListener("DOMContentLoaded", () => {
           "text-halign": "center",
           "text-margin-y": 7,
 
+          color: "#1f1f1f",
+          "text-background-color": "#ffffff",
           "text-background-opacity": 0.9,
           "text-background-padding": 3,
           "text-background-shape": "roundrectangle",
@@ -62,7 +73,13 @@ document.addEventListener("DOMContentLoaded", () => {
           label: "data(label)",
           "font-size": 13,
           "font-weight": 700,
-          color: "#ffffff",
+
+          /*
+           * 라이트 모드 기본값입니다.
+           * 실제 테마별 색상은 applyTheme()에서 갱신합니다.
+           */
+          color: "#111827",
+
           "text-valign": "center",
           "text-margin-y": 0,
           "text-max-width": 70,
@@ -96,7 +113,7 @@ document.addEventListener("DOMContentLoaded", () => {
         },
       },
 
-      // hover된 세부 토픽만 라벨 표시
+      // Hover된 세부 토픽만 라벨을 표시합니다.
       {
         selector: "node.topic-node.hovered",
         style: {
@@ -110,7 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
         },
       },
 
-      // 선택된 세부 토픽도 라벨 표시
+      // 선택된 세부 토픽도 라벨을 표시합니다.
       {
         selector: "node.topic-node:selected",
         style: {
@@ -162,9 +179,9 @@ document.addEventListener("DOMContentLoaded", () => {
         selector: "edge",
         style: {
           width: 1,
-          opacity: 0.35,
+          opacity: 0.42,
           "curve-style": "bezier",
-          "line-color": "#adb5bd",
+          "line-color": "#7a828a",
         },
       },
 
@@ -172,7 +189,8 @@ document.addEventListener("DOMContentLoaded", () => {
         selector: "edge.highlighted",
         style: {
           width: 2.2,
-          opacity: 0.9,
+          opacity: 0.95,
+          "line-color": "#495057",
         },
       },
 
@@ -197,7 +215,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /*
    * YAML에서 icon이 있는 노드는 상위 카테고리로 처리합니다.
-   * 나머지는 세부 토픽입니다.
+   * 나머지 노드는 세부 토픽으로 처리합니다.
    */
   cy.nodes().forEach((node) => {
     if (node.id() === "research-interests") {
@@ -209,17 +227,26 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  const darkSchemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
+  const prefersReducedMotion = reducedMotionQuery.matches;
 
   let physicsLayout;
   let stopTimer;
-  let initialFit = true;
+
+  /*
+   * 이전 레이아웃의 stop 이벤트가 새로운 레이아웃의 viewport를
+   * 변경하는 것을 방지하기 위한 실행 ID입니다.
+   */
+  let layoutRunId = 0;
 
   /*
    * 공통 Cola 레이아웃 옵션입니다.
    *
-   * 평상시에는 물리 엔진을 중단하고,
-   * 사용자가 노드를 드래그할 때만 무한 실행합니다.
+   * 최초 로딩과 Reset에서는 animate를 false로 덮어씁니다.
+   * 사용자가 노드를 드래그할 때만 animate를 true로 사용합니다.
    */
   const physicsOptions = {
     name: "cola",
@@ -236,10 +263,10 @@ document.addEventListener("DOMContentLoaded", () => {
     refresh: 1,
     convergenceThreshold: 0.01,
 
-    // 드래그 중 viewport가 움직이지 않도록 합니다.
+    // 물리 시뮬레이션 중 viewport가 자동으로 이동하지 않게 합니다.
     centerGraph: false,
 
-    // 물리 시뮬레이션 도중에도 노드를 드래그할 수 있게 합니다.
+    // 물리 시뮬레이션 중에도 노드를 드래그할 수 있게 합니다.
     ungrabifyWhileSimulating: false,
 
     nodeSpacing: (node) => {
@@ -269,24 +296,64 @@ document.addEventListener("DOMContentLoaded", () => {
     },
   };
 
-  function runPhysics({ infinite = false, maxSimulationTime = 1200, randomize = false } = {}) {
+  /*
+   * 현재 컨테이너 크기를 다시 계산한 뒤
+   * 전체 그래프가 한 번에 보이도록 맞춥니다.
+   */
+  function fitGraph() {
+    cy.resize();
+    cy.fit(cy.elements(), 45);
+  }
+
+  /*
+   * fit이 브라우저에 반영된 다음 그래프를 표시합니다.
+   */
+  function revealGraph() {
+    requestAnimationFrame(() => {
+      container.style.visibility = "visible";
+    });
+  }
+
+  function runPhysics({
+    infinite = false,
+    maxSimulationTime = 1200,
+    randomize = false,
+    animate = true,
+    fitOnStop = false,
+    revealOnStop = false,
+  } = {}) {
+    /*
+     * 실행 번호를 먼저 증가시켜 이전 레이아웃의 stop 콜백을
+     * 무효화합니다.
+     */
+    const currentRunId = ++layoutRunId;
+
     physicsLayout?.stop();
 
     const shouldRunInfinitely = infinite && !prefersReducedMotion;
 
     const layoutOptions = {
       ...physicsOptions,
+
+      animate: animate && !prefersReducedMotion,
       infinite: shouldRunInfinitely,
       randomize,
 
       stop: () => {
         /*
-         * 최초 로딩과 Reset 시에만 그래프 전체가 보이도록 맞춥니다.
-         * 드래그 후에는 viewport를 변경하지 않습니다.
+         * 이미 새로운 레이아웃이 실행된 경우,
+         * 이전 레이아웃의 stop 콜백은 무시합니다.
          */
-        if (initialFit) {
-          cy.fit(undefined, 45);
-          initialFit = false;
+        if (currentRunId !== layoutRunId) {
+          return;
+        }
+
+        if (fitOnStop) {
+          fitGraph();
+        }
+
+        if (revealOnStop) {
+          revealGraph();
         }
       },
     };
@@ -304,16 +371,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /*
    * 최초 페이지 로딩:
-   * 약 1.2초 동안만 배치한 뒤 물리 엔진을 정지합니다.
+   *
+   * 그래프를 숨긴 상태에서 애니메이션 없이 Cola 배치를 완료합니다.
+   * 이후 fit을 한 번 수행하고 최종 상태만 화면에 표시합니다.
+   *
+   * 따라서 기존처럼 확대된 상태에서 노드가 움직이다가
+   * 마지막 순간에 zoom-out되는 현상이 나타나지 않습니다.
    */
   runPhysics({
     infinite: false,
     maxSimulationTime: 1200,
     randomize: false,
+    animate: false,
+    fitOnStop: true,
+    revealOnStop: true,
   });
 
   /*
-   * 노드를 잡으면 물리 엔진을 켭니다.
+   * 노드를 잡으면 물리 엔진을 실행합니다.
    * 연결된 노드들이 용수철처럼 반응합니다.
    */
   cy.on("grab", "node", () => {
@@ -326,11 +401,15 @@ document.addEventListener("DOMContentLoaded", () => {
     runPhysics({
       infinite: true,
       randomize: false,
+      animate: true,
     });
   });
 
   /*
-   * 노드를 놓은 후 700ms 동안 흔들리게 한 뒤 물리 엔진을 정지합니다.
+   * 노드를 놓은 후 700ms 동안 움직인 뒤 물리 엔진을 정지합니다.
+   *
+   * 이때 fit은 실행하지 않으므로 사용자가 보고 있던 zoom과
+   * viewport는 바뀌지 않습니다.
    */
   cy.on("free", "node", () => {
     window.clearTimeout(stopTimer);
@@ -377,6 +456,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  /*
+   * 빈 공간을 클릭하면 선택과 강조를 해제합니다.
+   */
   cy.on("tap", (event) => {
     if (event.target !== cy) {
       return;
@@ -391,7 +473,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /*
-   * al-folio의 CSS 변수를 읽어 Cytoscape canvas의 색상을 갱신합니다.
+   * al-folio CSS 변수 또는 그래프 전용 CSS 변수를 읽습니다.
    */
   function getCssVariable(name, fallback) {
     const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -399,16 +481,57 @@ document.addEventListener("DOMContentLoaded", () => {
     return value || fallback;
   }
 
-  function applyTheme() {
+  /*
+   * al-folio의 data-theme/class 상태를 우선 확인합니다.
+   * 명시적인 테마 설정이 없으면 OS 테마를 사용합니다.
+   */
+  function isDarkTheme() {
     const html = document.documentElement;
+    const body = document.body;
 
-    const isDark = html.dataset.theme === "dark" || html.classList.contains("dark") || document.body.classList.contains("dark");
+    const htmlTheme = (html.dataset.theme || "").toLowerCase();
 
-    const textColor = getCssVariable("--global-text-color", isDark ? "#f1f1f1" : "#1f1f1f");
+    const bodyTheme = (body.dataset.theme || "").toLowerCase();
+
+    if (htmlTheme === "dark" || bodyTheme === "dark") {
+      return true;
+    }
+
+    if (htmlTheme === "light" || bodyTheme === "light") {
+      return false;
+    }
+
+    if (html.classList.contains("dark") || body.classList.contains("dark")) {
+      return true;
+    }
+
+    return darkSchemeQuery.matches;
+  }
+
+  /*
+   * 현재 테마에 맞춰 노드 텍스트와 edge 색상을 갱신합니다.
+   */
+  function applyTheme() {
+    const isDark = isDarkTheme();
+
+    const textColor = getCssVariable("--global-text-color", isDark ? "#f1f3f5" : "#1f1f1f");
 
     const backgroundColor = getCssVariable("--global-bg-color", isDark ? "#1c1c1d" : "#ffffff");
 
-    const edgeColor = getCssVariable("--global-divider-color", isDark ? "#747474" : "#adb5bd");
+    /*
+     * --global-divider-color는 다크 모드에서 지나치게 어두울 수 있어
+     * 그래프 전용 CSS 변수와 명시적인 대비값을 사용합니다.
+     */
+    const edgeColor = getCssVariable("--interest-graph-edge-color", isDark ? "#b8c0c8" : "#7a828a");
+
+    const highlightedEdgeColor = getCssVariable("--interest-graph-highlighted-edge-color", isDark ? "#f1f3f5" : "#495057");
+
+    /*
+     * 중심 노드 텍스트:
+     * 라이트 모드에서는 어두운 색,
+     * 다크 모드에서는 흰색을 사용합니다.
+     */
+    const rootTextColor = getCssVariable("--interest-graph-root-text-color", isDark ? "#ffffff" : "#111827");
 
     cy.style()
       .selector("node")
@@ -419,18 +542,28 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .selector("node.root-node")
       .style({
-        color: "#ffffff",
+        color: rootTextColor,
         "text-background-opacity": 0,
       })
       .selector("edge")
       .style({
         "line-color": edgeColor,
+        opacity: isDark ? 0.62 : 0.42,
+      })
+      .selector("edge.highlighted")
+      .style({
+        "line-color": highlightedEdgeColor,
+        opacity: 0.95,
       })
       .update();
   }
 
   applyTheme();
 
+  /*
+   * al-folio가 HTML 또는 body의 class/data-theme를 변경할 때
+   * Cytoscape canvas의 색상도 갱신합니다.
+   */
   const themeObserver = new MutationObserver(applyTheme);
 
   themeObserver.observe(document.documentElement, {
@@ -444,7 +577,18 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /*
-   * 탭을 벗어나면 물리 연산과 예약된 정지를 모두 중단합니다.
+   * 사이트가 명시적인 테마 속성을 사용하지 않는 경우를 위해
+   * OS 색상 테마 변경도 감지합니다.
+   */
+  if (typeof darkSchemeQuery.addEventListener === "function") {
+    darkSchemeQuery.addEventListener("change", applyTheme);
+  } else {
+    // 구형 Safari 호환
+    darkSchemeQuery.addListener(applyTheme);
+  }
+
+  /*
+   * 탭을 벗어나면 물리 연산과 예약된 정지를 중단합니다.
    * 탭으로 돌아왔을 때 자동으로 재실행하지는 않습니다.
    */
   document.addEventListener("visibilitychange", () => {
@@ -458,7 +602,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /*
    * Reset:
-   * 노드 위치를 다시 무작위화하고 약 1.2초 동안 재배치합니다.
+   *
+   * 그래프를 숨기고 노드 위치를 무작위화한 뒤
+   * 애니메이션 없이 다시 배치합니다.
+   *
+   * 배치가 끝나면 한 번만 fit하고 최종 상태를 표시합니다.
    */
   document.getElementById("interest-graph-reset")?.addEventListener("click", () => {
     window.clearTimeout(stopTimer);
@@ -466,12 +614,15 @@ document.addEventListener("DOMContentLoaded", () => {
     cy.elements().unselect();
     cy.elements().removeClass("faded highlighted");
 
-    initialFit = true;
+    container.style.visibility = "hidden";
 
     runPhysics({
       infinite: false,
       maxSimulationTime: 1200,
       randomize: true,
+      animate: false,
+      fitOnStop: true,
+      revealOnStop: true,
     });
 
     if (description) {
