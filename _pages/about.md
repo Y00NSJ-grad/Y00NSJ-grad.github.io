@@ -6,7 +6,7 @@ subtitle: <a href='#'>Affiliations</a>. Address. Contacts. Motto. Etc.
 
 profile:
   align: right
-  image: prof_pic.jpg
+  image: prof_pic.png
   image_circular: false # crops the image to make it circular
   more_info: >
     <p>yoon.sj@sookmyung.ac.kr</p>
@@ -30,9 +30,8 @@ latest_posts:
 
 I am an M.S. student in the Division of Computer Science at Sookmyung Women's University.
 My current research focuses on applying optimization theory and multi-agent reinforcement learning, combined with advanced AI methodologies such as generative models, to aerospace systems and next-generation communication networks.
-In parallel, I conduct research on quantum AI, particularly quantum federated learning and quantum reinforcement learning. 
+In parallel, I conduct research on quantum AI, particularly quantum federated learning and quantum reinforcement learning.
 My broader interests include physical AI, especially vision-language-action models and world models.
-
 
 <!-- My research interests lie at the intersection of artificial intelligence, optimization, and next-generation communication networks. I am particularly interested in reinforcement learning and multi-agent reinforcement learning for intelligent decision-making in mobile edge computing and heterogeneous network environments.
 
