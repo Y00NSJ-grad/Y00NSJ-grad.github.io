@@ -5,4 +5,4 @@ inline: true
 related_posts: false
 ---
 
-📜 A paper accepted to IEEE Quantum Week (QCE) 2026, International Workshop on Quantum Computing and Reinforcement Learning (QCRL).
+📜 A paper was accepted to 2026 IEEE 104th Vehicular Technology Conference (VTC2026-Fall) @ Boston.
