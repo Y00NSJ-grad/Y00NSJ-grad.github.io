@@ -1,10 +1,14 @@
 #interest-graph {
   width: 100%;
-  height: min(72vh, 760px);
-  min-height: 520px;
+  height: min(76vh, 820px);
+  min-height: 540px;
+  overflow: hidden;
   border: 1px solid var(--global-divider-color);
   border-radius: 0.75rem;
-  background: var(--global-bg-color);
+  background-color: var(--global-bg-color);
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .interest-graph-header {
@@ -23,6 +27,11 @@
   color: var(--global-theme-color);
   background: transparent;
   cursor: pointer;
+
+  &:hover {
+    color: var(--global-bg-color);
+    background: var(--global-theme-color);
+  }
 }
 
 #interest-description {
@@ -35,8 +44,8 @@
 
 @media (max-width: 576px) {
   #interest-graph {
-    height: 65vh;
-    min-height: 430px;
+    height: 67vh;
+    min-height: 450px;
   }
 
   .interest-graph-header {

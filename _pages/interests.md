@@ -26,4 +26,6 @@ nav_order: 4
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/cytoscape/dist/cytoscape.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/webcola@3.4.0/WebCola/cola.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/cytoscape-cola@2.1.0/cytoscape-cola.js"></script>
 <script src="{{ '/assets/js/interests-graph.js' | relative_url }}"></script>
