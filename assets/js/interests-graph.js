@@ -209,9 +209,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  const prefersReducedMotion = window.matchMedia(
-    "(prefers-reduced-motion: reduce)",
-  ).matches;
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   let physicsLayout;
   let stopTimer;
@@ -271,11 +269,7 @@ document.addEventListener("DOMContentLoaded", () => {
     },
   };
 
-  function runPhysics({
-    infinite = false,
-    maxSimulationTime = 1200,
-    randomize = false,
-  } = {}) {
+  function runPhysics({ infinite = false, maxSimulationTime = 1200, randomize = false } = {}) {
     physicsLayout?.stop();
 
     const shouldRunInfinitely = infinite && !prefersReducedMotion;
@@ -400,9 +394,7 @@ document.addEventListener("DOMContentLoaded", () => {
    * al-folio의 CSS 변수를 읽어 Cytoscape canvas의 색상을 갱신합니다.
    */
   function getCssVariable(name, fallback) {
-    const value = getComputedStyle(document.documentElement)
-      .getPropertyValue(name)
-      .trim();
+    const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
     return value || fallback;
   }
@@ -410,25 +402,13 @@ document.addEventListener("DOMContentLoaded", () => {
   function applyTheme() {
     const html = document.documentElement;
 
-    const isDark =
-      html.dataset.theme === "dark" ||
-      html.classList.contains("dark") ||
-      document.body.classList.contains("dark");
+    const isDark = html.dataset.theme === "dark" || html.classList.contains("dark") || document.body.classList.contains("dark");
 
-    const textColor = getCssVariable(
-      "--global-text-color",
-      isDark ? "#f1f1f1" : "#1f1f1f",
-    );
+    const textColor = getCssVariable("--global-text-color", isDark ? "#f1f1f1" : "#1f1f1f");
 
-    const backgroundColor = getCssVariable(
-      "--global-bg-color",
-      isDark ? "#1c1c1d" : "#ffffff",
-    );
+    const backgroundColor = getCssVariable("--global-bg-color", isDark ? "#1c1c1d" : "#ffffff");
 
-    const edgeColor = getCssVariable(
-      "--global-divider-color",
-      isDark ? "#747474" : "#adb5bd",
-    );
+    const edgeColor = getCssVariable("--global-divider-color", isDark ? "#747474" : "#adb5bd");
 
     cy.style()
       .selector("node")
@@ -480,33 +460,26 @@ document.addEventListener("DOMContentLoaded", () => {
    * Reset:
    * 노드 위치를 다시 무작위화하고 약 1.2초 동안 재배치합니다.
    */
-  document
-    .getElementById("interest-graph-reset")
-    ?.addEventListener("click", () => {
-      window.clearTimeout(stopTimer);
+  document.getElementById("interest-graph-reset")?.addEventListener("click", () => {
+    window.clearTimeout(stopTimer);
 
-      cy.elements().unselect();
-      cy.elements().removeClass("faded highlighted");
+    cy.elements().unselect();
+    cy.elements().removeClass("faded highlighted");
 
-      initialFit = true;
+    initialFit = true;
 
-      runPhysics({
-        infinite: false,
-        maxSimulationTime: 1200,
-        randomize: true,
-      });
-
-      if (description) {
-        description.textContent = "Select a node to view its description.";
-      }
+    runPhysics({
+      infinite: false,
+      maxSimulationTime: 1200,
+      randomize: true,
     });
 
+    if (description) {
+      description.textContent = "Select a node to view its description.";
+    }
+  });
+
   function escapeHtml(value) {
-    return String(value)
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
+    return String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
   }
 });
