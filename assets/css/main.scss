@@ -14,7 +14,7 @@
  * $cyan-color:   dark mode accent color
  */
 @use "variables" with (
-  $max-content-width: {{ site.max_width | default: "930px" }},
+  $max-content-width: {{site.max_width | default: "930px"}},
   $purple-color: #2261ff,
   $cyan-color: #6c8eff
 );
