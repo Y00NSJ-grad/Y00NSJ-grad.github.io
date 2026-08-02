@@ -1,189 +1,216 @@
 cv:
-  name: Albert Einstein
-  label: Scientist
-  email: einstein@example.com
-  location: Princeton, NJ
+  name: Seojin Yoon
+  # label: Scientist
+  email: yoon.sj@sookmyung.ac.kr
+  location: Seoul, South Korea
   image: ""
-  summary: A German-born theoretical physicist, widely ranked among the greatest and most influential scientists of all time
+  # summary: A German-born theoretical physicist, widely ranked among the greatest and most influential scientists of all time
 
   social_networks:
-    - network: X
-      username: AlbertEinstein
     - network: GitHub
-      username: example
-    - network: LinkedIn
-      username: example
+      username: Y00NSJ-grad
+    # - network: LinkedIn
+    #   username: example
 
   address:
-    street: 2712 Broadway St
-    city: San Francisco
-    region: California
-    postalCode: CA 94115
-    countryCode: US
+    street: 100, Cheongpa-ro 47-gil
+    city: Yongsan-gu
+    region: Seoul
+    postalCode: 04310
+    countryCode: South Korea
 
   sections:
     Education:
-      - institution: University of Zurich
-        location: Zurich, Switzerland
-        url: https://www.uzh.ch/
-        area: Physics
+      - institution: Sookmyung Women's University
+        location: Seoul, South Korea
+        area: Computer Science
         studyType: PhD
-        start_date: 1900
-        end_date: 1905
-        score: ""
-        courses: "Theory of Relativity"
+        start_date: 2026
+        end_date: 
         highlights:
-          - Description 1.
-          - Description 2.
 
-      - institution: Eidgenössische Technische Hochschule
-        location: Zurich, Switzerland
-        area: Physics
-        studyType: Federal teaching diploma
-        start_date: 1896
-        end_date: 1900
+
+      - institution: Sookmyung Women's University
+        location: Seoul, South Korea
+        area: Computer Science
+        start_date: 2019
+        end_date: 2026
         highlights:
-          - Description 1.
-          - Description 2.
+          - Minored in English Language and Literature.
 
-    Experience:
-      - company: Institute for Advanced Study, Princeton University
-        position: Professor of Theoretical Physics
-        location: Princeton University, NJ
-        start_date: 1933
-        end_date: 1955
-        summary: Teaching at Palmer Physical Laboratory (now 302 Frist Campus Center). While not a professor at Princeton, I associated with the physics professors and continued to give lectures on campus.
-        highlights:
-          - Relativity
-          - Description 2.
+    # Experience:
+    #   - company: Institute for Advanced Study, Princeton University
+    #     position: Professor of Theoretical Physics
+    #     location: Princeton University, NJ
+    #     start_date: 1933
+    #     end_date: 1955
+    #     summary: Teaching at Palmer Physical Laboratory (now 302 Frist Campus Center). While not a professor at Princeton, I associated with the physics professors and continued to give lectures on campus.
+    #     highlights:
+    #       - Relativity
+    #       - Description 2.
 
-      - company: California Institute of Technology
-        position: Visiting Professor
-        location: Pasadena, California, US
-        start_date: 1933
-        end_date: 1933
-        highlights:
-          - Description 1.
-          - Description 2.
+    #   - company: California Institute of Technology
+    #     position: Visiting Professor
+    #     location: Pasadena, California, US
+    #     start_date: 1933
+    #     end_date: 1933
+    #     highlights:
+    #       - Description 1.
+    #       - Description 2.
 
-      - company: Kaiser Wilhelm Institute for Physics
-        position: Director
-        location: Berlin, Germany
-        start_date: 1917
-        end_date: 1933
+    #   - company: Kaiser Wilhelm Institute for Physics
+    #     position: Director
+    #     location: Berlin, Germany
+    #     start_date: 1917
+    #     end_date: 1933
 
-      - company: Karl-Ferdinand University
-        position: Professor of Theoretical Physics
-        location: Prague, Czechoslovakia
-        start_date: 1911
-        end_date: 1917
+    #   - company: Karl-Ferdinand University
+    #     position: Professor of Theoretical Physics
+    #     location: Prague, Czechoslovakia
+    #     start_date: 1911
+    #     end_date: 1917
 
-      - company: University of Zurich
-        position: Associate Professor of Theoretical Physics
-        location: Zurich, Switzerland
-        start_date: 1909
-        end_date: 1911
+    #   - company: University of Zurich
+    #     position: Associate Professor of Theoretical Physics
+    #     location: Zurich, Switzerland
+    #     start_date: 1909
+    #     end_date: 1911
 
-    Volunteer:
-      - company: People's Climate March
-        position: Lead Organizer
-        location: Zurich, Switzerland
-        start_date: 2014-04-01
-        end_date: 2015-07-01
-        summary: Lead organizer for the New York City branch of the People's Climate March, the largest climate march in history.
-        highlights:
-          - "Awarded 'Climate Hero' award by Greenpeace for my efforts organizing the march."
-          - "Men of the year 2014 by Time magazine"
+    # Volunteer:
+    #   - company: People's Climate March
+    #     position: Lead Organizer
+    #     location: Zurich, Switzerland
+    #     start_date: 2014-04-01
+    #     end_date: 2015-07-01
+    #     summary: Lead organizer for the New York City branch of the People's Climate March, the largest climate march in history.
+    #     highlights:
+    #       - "Awarded 'Climate Hero' award by Greenpeace for my efforts organizing the march."
+    #       - "Men of the year 2014 by Time magazine"
 
-    Awards:
-      - title: Nobel Prize in Physics
-        authors:
-          - "Royal Swedish Academy of Sciences"
-        date: 1921-11-01
-        awarder: Royal Swedish Academy of Sciences
-        url: https://www.nobelprize.org/prizes/physics/1921/einstein/biographical/
-        summary: The Nobel Prizes are five separate prizes that, according to Alfred Nobel's will of 1895, are awarded to 'those who, during the preceding year, have conferred the greatest benefit to humankind.'
+    # Awards:
+    #   - title: Nobel Prize in Physics
+    #     authors:
+    #       - "Royal Swedish Academy of Sciences"
+    #     date: 1921-11-01
+    #     awarder: Royal Swedish Academy of Sciences
+    #     url: https://www.nobelprize.org/prizes/physics/1921/einstein/biographical/
+    #     summary: The Nobel Prizes are five separate prizes that, according to Alfred Nobel's will of 1895, are awarded to 'those who, during the preceding year, have conferred the greatest benefit to humankind.'
 
-      - title: Max Planck Medal
-        authors:
-          - "German Physical Society"
-        date: 2029
-        awarder: German Physical Society
-        summary: Awarded for outstanding scientific achievement
+    #   - title: Max Planck Medal
+    #     authors:
+    #       - "German Physical Society"
+    #     date: 2029
+    #     awarder: German Physical Society
+    #     summary: Awarded for outstanding scientific achievement
 
     Publications:
-      - title: Zur Elektrodynamik bewegter Körper
+      - title: (TBD)
         authors:
-          - Albert Einstein
-        publisher: Annalen der Physik
-        releaseDate: 1905-06-30
-        url: https://en.wikisource.org/wiki/Translation:On_the_Electrodynamics_of_Moving_Bodies
-        summary: It concerned an interpretation of the Michelson–Morley experiment and the properties of light and time. Special relativity incorporates the principle that the speed of light is the same for all inertial observers regardless of the state of motion of the source.
+          - Seojin Yoon
+          - Soohyun Park
+        publisher: 2026 IEEE International Conference on Quantum Computing and Engineering (QCE)
+        releaseDate: 2026-00-00
+        url: TBD
+        summary: 
 
-      - title: Über einen die Erzeugung und Verwandlung des Lichtes betreffenden heuristischen Gesichtspunkt
+      - title: Lyapunov-Guided DRL for Energy-Efficient and Low-Latency Control of Multi-UAV MEC in IIoT
         authors:
-          - Albert Einstein
-        publisher: Annalen der Physik
-        releaseDate: 1905-03-18
-        url: https://de.wikisource.org/wiki/Über_einen_die_Erzeugung_und_Verwandlung_des_Lichtes_betreffenden_heuristischen_Gesichtspunkt
-        summary: In the second paper, he applied the quantum theory to light to explain the photoelectric effect. In particular, he used the idea of light quanta (photons) to explain experimental results, but stressed the importance of the experimental results. The importance of his work on the photoelectric effect earned him the Nobel Prize in Physics in 1921.
+          - Seojin Yoon
+          - Soohyun Park
+        publisher: 2026 IEEE 104th Vehicular Technology Conference (VTC2026-Fall)
+        releaseDate: 2026-00-00
+        url: TBD
+        summary: 
 
-      - title: Die Grundlage der allgemeinen Relativitätstheorie
+      - title: 강화학습 기반 고급 AI 융합 UAV 궤적·전력·빔포밍 최적화 동향 및 공동 최적화 제안
         authors:
-          - Albert Einstein
-        publisher: Annalen der Physik
-        releaseDate: 1916-03-20
-        url: https://de.wikisource.org/wiki/Die_Grundlage_der_allgemeinen_Relativitätstheorie
-        summary: The publication of the theory of general relativity made him internationally famous. He was professor of physics at the universities of Zurich (1909–1911) and Prague (1911–1912), before he returned to ETH Zurich (1912–1914).
+          - 윤서진
+          - 박수현
+        publisher: 2025 대한전자공학회 추계학술대회
+        releaseDate: 2025-11-30
+        url: https://www.dbpia.co.kr/journal/articleDetail?nodeId=NODE12551326
+        summary: 
 
-    Skills:
-      - name: Physics
+    # Skills:
+    #   - name: Physics
         level: Master
         icon: fa-solid fa-hashtag
         keywords: "Quantum Mechanics, Quantum Computing, Quantum Information, Quantum Cryptography, Quantum Communication, Quantum Teleportation"
 
-    Languages:
-      - name: German
-        summary: "Native speaker"
+    # Languages:
+    #   - name: German
+    #     summary: "Native speaker"
 
-      - name: English
-        summary: "Fluent"
+    #   - name: English
+    #     summary: "Fluent"
 
     Interests:
-      - name: Physics
-        icon: fa-solid fa-tag
-        keywords: "Quantum Mechanics, Quantum Computing, Quantum Information, Quantum Cryptography, Quantum Communication, Quantum Teleportation"
+      - name: Reinforcement Learning
+        icon: fa-solid fa-diagram-project
+        keywords: "Reinforcement Learning (RL), Multi-Agent Reinforcement Learning (MARL)"
 
-    Certificates:
-      - name: Machine Learning
-        date: 2018-01-01
-        issuer: Stanford University
-        icon: fa-solid fa-location-dot
+      - name: Mobile Edge Computing and Wireless Networks
+        icon: fa-solid fa-server
+        keywords: "Mobile Edge Computing (MEC), Edge Caching, Ultra-Reliable Low-Latency Communication (URLLC), Integrated Sensing, Communication, and Computation (ISCC)"
 
-      - name: Quantum Computing
-        date: 2018-01-01
-        issuer: Stanford University
-        icon: fa-solid fa-tag
+      - name: Integrated and Non-Terrestrial Networks
+        icon: fa-solid fa-satellite-dish
+        keywords: "Space-Air-Ground Integrated Networks (SAGIN), Space-Air-Ground-Sea Integrated Networks, Non-Terrestrial Networks (NTN)"
 
-      - name: Quantum Information
-        date: 2018-01-01
-        issuer: Stanford University
-        icon: fa-solid fa-envelope
+      - name: Satellite Communications and Networking
+        icon: fa-solid fa-satellite
+        keywords: "LEO, MEO, and GEO Satellites, Satellite Routing, Satellite Handover"
 
-    Projects:
-      - name: Quantum Computing
-        summary: Quantum computing is the use of quantum-mechanical phenomena such as superposition and entanglement to perform computation. Computers that perform quantum computations are known as quantum computers.
-        highlights:
-          - Quantum Teleportation
-          - Quantum Cryptography
-        start_date: 2018-01-01
-        end_date: 2018-01-01
+      - name: UAV Systems and Autonomous Operations
+        icon: fa-solid fa-plane
+        keywords: "UAV-Assisted MEC, UAV Surveillance, UAV Trajectory Control"
 
-    References:
-      - name: Professor John Doe
-        icon: fa-solid fa-laptop
-        reference: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam condimentum, diam quis convallis euismod, arcu mi ullamcorper lorem, a vestibulum nunc magna at sem. Sed in risus ac felis varius blandit.
+      - name: Advanced AI
+        icon: fa-solid fa-brain
+        keywords: "Generative AI, Diffusion Models, Graph Neural Networks (GNNs)"
 
-      - name: Professor Jane Smith
-        icon: fa-solid fa-thumbtack
-        reference: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam condimentum, diam quis convallis euismod, arcu mi ullamcorper lorem, a vestibulum nunc magna at sem. Sed in risus ac felis varius blandit.
+      - name: Embodied and Physical AI
+        icon: fa-solid fa-robot
+        keywords: "Physical AI, Vision-Language-Action Models (VLA), Digital Twins, World Model"
+
+      - name: Quantum AI
+        icon: fa-solid fa-atom
+        keywords: "Quantum Machine Learning (QML), Quantum Federated Learning (QFL), Quantum Reinforcement Learning (QRL)"
+
+      - name: Optimization Theory
+        icon: fa-solid fa-calendar-check
+        keywords: "Lyapunov, Lagrangian, Game Theory, Auction-based, Successive Convex Approximation (SCA), Quadratic Unconstrained Binary Optimization (QUBO)"
+
+    # Certificates:
+    #   - name: Machine Learning
+    #     date: 2018-01-01
+    #     issuer: Stanford University
+    #     icon: fa-solid fa-location-dot
+
+    #   - name: Quantum Computing
+    #     date: 2018-01-01
+    #     issuer: Stanford University
+    #     icon: fa-solid fa-tag
+
+    #   - name: Quantum Information
+    #     date: 2018-01-01
+    #     issuer: Stanford University
+    #     icon: fa-solid fa-envelope
+
+    # Projects:
+    #   - name: Quantum Computing
+    #     summary: Quantum computing is the use of quantum-mechanical phenomena such as superposition and entanglement to perform computation. Computers that perform quantum computations are known as quantum computers.
+    #     highlights:
+    #       - Quantum Teleportation
+    #       - Quantum Cryptography
+    #     start_date: 2018-01-01
+    #     end_date: 2018-01-01
+
+    # References:
+    #   - name: Professor John Doe
+    #     icon: fa-solid fa-laptop
+    #     reference: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam condimentum, diam quis convallis euismod, arcu mi ullamcorper lorem, a vestibulum nunc magna at sem. Sed in risus ac felis varius blandit.
+
+    #   - name: Professor Jane Smith
+    #     icon: fa-solid fa-thumbtack
+    #     reference: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam condimentum, diam quis convallis euismod, arcu mi ullamcorper lorem, a vestibulum nunc magna at sem. Sed in risus ac felis varius blandit.
