@@ -15,8 +15,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /*
-   * 최초 렌더링 시 random/cola 중간 상태가 보이지 않도록 숨깁니다.
-   * Cola 배치와 fit이 모두 끝난 뒤 그래프를 표시합니다.
+   * 최초 random 배치와 viewport 설정 과정은 숨깁니다.
+   * viewport가 결정된 뒤 그래프를 표시하고 Cola 애니메이션을 실행합니다.
    */
   container.style.visibility = "hidden";
 
@@ -30,12 +30,13 @@ document.addEventListener("DOMContentLoaded", () => {
     wheelSensitivity: 0.18,
 
     /*
-     * Cytoscape 생성 시 임시 위치만 만듭니다.
-     * fit은 Cola 레이아웃이 끝난 뒤 한 번만 수행합니다.
+     * 최초 임시 위치입니다.
+     * 실제 물리 배치는 아래 prepareViewportAndRunPhysics()에서 실행합니다.
      */
     layout: {
       name: "random",
       fit: false,
+      animate: false,
     },
 
     style: [
@@ -45,18 +46,22 @@ document.addEventListener("DOMContentLoaded", () => {
           width: 16,
           height: 16,
           label: "",
+
           "background-color": "#6c757d",
           "border-width": 0,
 
           "font-size": 9,
           "font-weight": 400,
+
           "text-wrap": "wrap",
           "text-max-width": 100,
+
           "text-valign": "bottom",
           "text-halign": "center",
           "text-margin-y": 7,
 
           color: "#1f1f1f",
+
           "text-background-color": "#ffffff",
           "text-background-opacity": 0.9,
           "text-background-padding": 3,
@@ -64,27 +69,33 @@ document.addEventListener("DOMContentLoaded", () => {
         },
       },
 
-      // 중심 노드
+      /*
+       * 중심 노드
+       *
+       * 실제 글자색은 applyTheme()에서 현재 테마에 맞게 갱신합니다.
+       */
       {
         selector: "node.root-node",
         style: {
           width: 46,
           height: 46,
+
           label: "data(label)",
+
           "font-size": 13,
           "font-weight": 700,
 
-          /*
-           * 라이트 모드 기본값입니다.
-           * 실제 테마별 색상은 applyTheme()에서 갱신합니다.
-           */
           color: "#111827",
 
           "text-valign": "center",
+          "text-halign": "center",
           "text-margin-y": 0,
           "text-max-width": 70,
+
           "text-background-opacity": 0,
+
           "background-color": "#0879df",
+
           "border-width": 3,
           "border-color": "#ffffff",
         },
@@ -96,7 +107,9 @@ document.addEventListener("DOMContentLoaded", () => {
         style: {
           width: 24,
           height: 24,
+
           label: "data(label)",
+
           "font-size": 10,
           "font-weight": 600,
           "text-max-width": 125,
@@ -119,10 +132,13 @@ document.addEventListener("DOMContentLoaded", () => {
         style: {
           width: 19,
           height: 19,
+
           label: "data(label)",
+
           "font-size": 10,
           "font-weight": 600,
           "text-max-width": 135,
+
           "z-index": 999,
         },
       },
@@ -133,12 +149,16 @@ document.addEventListener("DOMContentLoaded", () => {
         style: {
           width: 21,
           height: 21,
+
           label: "data(label)",
+
           "font-size": 10,
           "font-weight": 600,
           "text-max-width": 135,
+
           "border-width": 3,
           "border-color": "#ffffff",
+
           "z-index": 1000,
         },
       },
@@ -147,44 +167,47 @@ document.addEventListener("DOMContentLoaded", () => {
       {
         selector: 'node[category = "ai"]',
         style: {
-          "background-color": "#9c27b0",
+          "background-color": "#0a369d",
         },
       },
       {
         selector: 'node[category = "network"]',
         style: {
-          "background-color": "#009688",
+          "background-color": "#0077b6",
         },
       },
       {
         selector: 'node[category = "aerospace"]',
         style: {
-          "background-color": "#ff9100",
+          "background-color": "#00b4d8",
         },
       },
       {
         selector: 'node[category = "quantum"]',
         style: {
-          "background-color": "#4054b2",
+          "background-color": "#90e0ef",
         },
       },
       {
         selector: 'node[category = "optimization"]',
         style: {
-          "background-color": "#e91e63",
+          "background-color": "#caf0f8",
         },
       },
 
+      // 기본 edge
       {
         selector: "edge",
         style: {
           width: 1,
           opacity: 0.42,
+
           "curve-style": "bezier",
           "line-color": "#7a828a",
         },
       },
 
+      // 강조된 edge
       {
         selector: "edge.highlighted",
         style: {
@@ -205,8 +228,10 @@ document.addEventListener("DOMContentLoaded", () => {
         selector: "node.highlighted",
         style: {
           opacity: 1,
+
           "border-width": 3,
           "border-color": "#ffffff",
+
           "z-index": 1000,
         },
       },
@@ -231,42 +256,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const darkSchemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
-  const prefersReducedMotion = reducedMotionQuery.matches;
-
-  let physicsLayout;
-  let stopTimer;
+  let physicsLayout = null;
+  let stagingLayout = null;
+  let stopTimer = null;
 
   /*
-   * 이전 레이아웃의 stop 이벤트가 새로운 레이아웃의 viewport를
-   * 변경하는 것을 방지하기 위한 실행 ID입니다.
+   * 이전 레이아웃의 stop 콜백이 새 레이아웃에 영향을 주는 것을
+   * 방지하기 위한 실행 번호입니다.
    */
   let layoutRunId = 0;
 
   /*
-   * 공통 Cola 레이아웃 옵션입니다.
+   * 공통 Cola 물리 레이아웃 옵션입니다.
    *
-   * 최초 로딩과 Reset에서는 animate를 false로 덮어씁니다.
-   * 사용자가 노드를 드래그할 때만 animate를 true로 사용합니다.
+   * fit은 항상 false로 유지합니다.
+   * 따라서 물리 시뮬레이션 종료 시 viewport가 갑자기 바뀌지 않습니다.
    */
   const physicsOptions = {
     name: "cola",
+
     animate: true,
     fit: false,
-    padding: 45,
 
     avoidOverlap: true,
     handleDisconnected: true,
 
-    // 라벨은 대부분 숨겨져 있으므로 충돌 계산에서 제외합니다.
     nodeDimensionsIncludeLabels: false,
 
     refresh: 1,
     convergenceThreshold: 0.01,
 
-    // 물리 시뮬레이션 중 viewport가 자동으로 이동하지 않게 합니다.
     centerGraph: false,
-
-    // 물리 시뮬레이션 중에도 노드를 드래그할 수 있게 합니다.
     ungrabifyWhileSimulating: false,
 
     nodeSpacing: (node) => {
@@ -297,70 +317,46 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   /*
-   * 현재 컨테이너 크기를 다시 계산한 뒤
-   * 전체 그래프가 한 번에 보이도록 맞춥니다.
+   * Cola 물리 시뮬레이션을 실행합니다.
+   *
+   * 여기서는 cy.fit()을 호출하지 않습니다.
+   * 사용자가 보고 있는 zoom과 pan을 그대로 유지합니다.
    */
-  function fitGraph() {
-    cy.resize();
-    cy.fit(cy.elements(), 45);
-  }
-
-  /*
-   * fit이 브라우저에 반영된 다음 그래프를 표시합니다.
-   */
-  function revealGraph() {
-    requestAnimationFrame(() => {
-      container.style.visibility = "visible";
-    });
-  }
-
-  function runPhysics({
-    infinite = false,
-    maxSimulationTime = 1200,
-    randomize = false,
-    animate = true,
-    fitOnStop = false,
-    revealOnStop = false,
-  } = {}) {
-    /*
-     * 실행 번호를 먼저 증가시켜 이전 레이아웃의 stop 콜백을
-     * 무효화합니다.
-     */
+  function runPhysics({ infinite = false, maxSimulationTime = 1600, randomize = false } = {}) {
     const currentRunId = ++layoutRunId;
 
+    stagingLayout?.stop();
     physicsLayout?.stop();
+
+    const prefersReducedMotion = reducedMotionQuery.matches;
 
     const shouldRunInfinitely = infinite && !prefersReducedMotion;
 
     const layoutOptions = {
       ...physicsOptions,
 
-      animate: animate && !prefersReducedMotion,
+      animate: !prefersReducedMotion,
       infinite: shouldRunInfinitely,
       randomize,
 
       stop: () => {
         /*
-         * 이미 새로운 레이아웃이 실행된 경우,
-         * 이전 레이아웃의 stop 콜백은 무시합니다.
+         * 새로운 레이아웃이 이미 시작됐다면
+         * 이전 레이아웃의 stop 콜백을 무시합니다.
          */
         if (currentRunId !== layoutRunId) {
           return;
         }
 
-        if (fitOnStop) {
-          fitGraph();
-        }
-
-        if (revealOnStop) {
-          revealGraph();
-        }
+        /*
+         * 의도적으로 아무것도 하지 않습니다.
+         *
+         * 기존 코드의 cy.fit()이 여기에 있었기 때문에
+         * 애니메이션이 끝날 때 갑자기 zoom-out됐습니다.
+         */
       },
     };
 
-    /*
-     * infinite 모드가 아닌 경우에만 실행 시간 제한을 설정합니다.
-     */
     if (!shouldRunInfinitely) {
       layoutOptions.maxSimulationTime = maxSimulationTime;
     }
@@ -370,46 +366,108 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /*
-   * 최초 페이지 로딩:
+   * 최초 viewport를 준비한 뒤 Cola 애니메이션을 실행합니다.
    *
-   * 그래프를 숨긴 상태에서 애니메이션 없이 Cola 배치를 완료합니다.
-   * 이후 fit을 한 번 수행하고 최종 상태만 화면에 표시합니다.
-   *
-   * 따라서 기존처럼 확대된 상태에서 노드가 움직이다가
-   * 마지막 순간에 zoom-out되는 현상이 나타나지 않습니다.
+   * 처리 순서:
+   * 1. 그래프를 숨긴 상태로 random 배치
+   * 2. random 배치를 기준으로 viewport를 한 번만 fit
+   * 3. 그래프 표시
+   * 4. Cola 물리 애니메이션 실행
+   * 5. Cola 종료 시에는 fit하지 않음
    */
-  runPhysics({
-    infinite: false,
-    maxSimulationTime: 1200,
-    randomize: false,
-    animate: false,
-    fitOnStop: true,
-    revealOnStop: true,
+  function prepareViewportAndRunPhysics({ maxSimulationTime = 1600 } = {}) {
+    const currentRunId = ++layoutRunId;
+
+    window.clearTimeout(stopTimer);
+
+    stagingLayout?.stop();
+    physicsLayout?.stop();
+
+    container.style.visibility = "hidden";
+
+    stagingLayout = cy.layout({
+      name: "random",
+
+      animate: false,
+      fit: false,
+
+      padding: 45,
+
+      stop: () => {
+        if (currentRunId !== layoutRunId) {
+          return;
+        }
+
+        /*
+         * random 위치가 만들어진 시점에 viewport를 미리 고정합니다.
+         * container가 숨겨져 있으므로 사용자는 이 zoom 변경을 보지 않습니다.
+         */
+        cy.resize();
+        cy.fit(cy.elements(), 45);
+
+        requestAnimationFrame(() => {
+          if (currentRunId !== layoutRunId) {
+            return;
+          }
+
+          /*
+           * viewport가 준비된 상태에서 그래프를 표시합니다.
+           */
+          container.style.visibility = "visible";
+
+          requestAnimationFrame(() => {
+            if (currentRunId !== layoutRunId) {
+              return;
+            }
+
+            /*
+             * 화면에 표시된 후 Cola를 실행하므로
+             * Obsidian처럼 노드가 움직이는 과정을 볼 수 있습니다.
+             */
+            runPhysics({
+              infinite: false,
+              maxSimulationTime,
+              randomize: false,
+            });
+          });
+        });
+      },
+    });
+
+    stagingLayout.run();
+  }
+
+  /*
+   * 최초 로딩입니다.
+   *
+   * viewport는 Cola 실행 전에 한 번만 맞추고,
+   * Cola가 끝날 때는 viewport를 변경하지 않습니다.
+   */
+  prepareViewportAndRunPhysics({
+    maxSimulationTime: 1600,
   });
 
   /*
-   * 노드를 잡으면 물리 엔진을 실행합니다.
+   * 노드를 잡으면 물리 엔진을 무한 실행합니다.
    * 연결된 노드들이 용수철처럼 반응합니다.
    */
   cy.on("grab", "node", () => {
     window.clearTimeout(stopTimer);
 
-    if (prefersReducedMotion) {
+    if (reducedMotionQuery.matches) {
       return;
     }
 
     runPhysics({
       infinite: true,
       randomize: false,
-      animate: true,
     });
   });
 
   /*
-   * 노드를 놓은 후 700ms 동안 움직인 뒤 물리 엔진을 정지합니다.
+   * 노드를 놓은 뒤 700ms 동안 움직이게 한 다음 정지합니다.
    *
-   * 이때 fit은 실행하지 않으므로 사용자가 보고 있던 zoom과
-   * viewport는 바뀌지 않습니다.
+   * 정지할 때 fit하지 않으므로 zoom과 pan은 바뀌지 않습니다.
    */
   cy.on("free", "node", () => {
     window.clearTimeout(stopTimer);
@@ -420,7 +478,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /*
-   * 세부 노드는 hover할 때만 라벨을 표시합니다.
+   * 세부 토픽은 hover할 때만 라벨을 표시합니다.
    */
   cy.on("mouseover", "node.topic-node", (event) => {
     event.target.addClass("hovered");
@@ -430,11 +488,11 @@ document.addEventListener("DOMContentLoaded", () => {
     event.target.removeClass("hovered");
   });
 
-  /*
-   * 노드 선택 시 해당 노드와 주변 관계만 강조합니다.
-   */
   const description = document.getElementById("interest-description");
 
+  /*
+   * 노드를 선택하면 해당 노드와 인접 관계만 강조합니다.
+   */
   cy.on("tap", "node", (event) => {
     const node = event.target;
     const neighborhood = node.closedNeighborhood();
@@ -473,7 +531,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /*
-   * al-folio CSS 변수 또는 그래프 전용 CSS 변수를 읽습니다.
+   * CSS 변수 값을 읽습니다.
    */
   function getCssVariable(name, fallback) {
     const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -482,16 +540,15 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /*
-   * al-folio의 data-theme/class 상태를 우선 확인합니다.
-   * 명시적인 테마 설정이 없으면 OS 테마를 사용합니다.
+   * 현재 사이트 테마를 판별합니다.
    */
   function isDarkTheme() {
     const html = document.documentElement;
     const body = document.body;
 
-    const htmlTheme = (html.dataset.theme || "").toLowerCase();
+    const htmlTheme = String(html.dataset.theme || "").toLowerCase();
 
-    const bodyTheme = (body.dataset.theme || "").toLowerCase();
+    const bodyTheme = String(body.dataset.theme || "").toLowerCase();
 
     if (htmlTheme === "dark" || bodyTheme === "dark") {
       return true;
@@ -509,7 +566,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /*
-   * 현재 테마에 맞춰 노드 텍스트와 edge 색상을 갱신합니다.
+   * 현재 테마에 맞춰 Cytoscape canvas 색상을 갱신합니다.
    */
   function applyTheme() {
     const isDark = isDarkTheme();
@@ -519,19 +576,22 @@ document.addEventListener("DOMContentLoaded", () => {
     const backgroundColor = getCssVariable("--global-bg-color", isDark ? "#1c1c1d" : "#ffffff");
 
     /*
-     * --global-divider-color는 다크 모드에서 지나치게 어두울 수 있어
-     * 그래프 전용 CSS 변수와 명시적인 대비값을 사용합니다.
+     * al-folio의 --global-divider-color는 다크 모드에서
+     * 너무 어두울 수 있으므로 그래프 전용 색상을 사용합니다.
      */
     const edgeColor = getCssVariable("--interest-graph-edge-color", isDark ? "#b8c0c8" : "#7a828a");
 
     const highlightedEdgeColor = getCssVariable("--interest-graph-highlighted-edge-color", isDark ? "#f1f3f5" : "#495057");
 
     /*
-     * 중심 노드 텍스트:
+     * 중심 노드 글자색입니다.
+     *
      * 라이트 모드에서는 어두운 색,
      * 다크 모드에서는 흰색을 사용합니다.
      */
     const rootTextColor = getCssVariable("--interest-graph-root-text-color", isDark ? "#ffffff" : "#111827");
+
+    const selectionBorderColor = getCssVariable("--interest-graph-selection-border-color", isDark ? "#ffffff" : "#212529");
 
     cy.style()
       .selector("node")
@@ -544,6 +604,15 @@ document.addEventListener("DOMContentLoaded", () => {
       .style({
         color: rootTextColor,
         "text-background-opacity": 0,
+        "border-color": selectionBorderColor,
+      })
+      .selector("node.topic-node:selected")
+      .style({
+        "border-color": selectionBorderColor,
+      })
+      .selector("node.highlighted")
+      .style({
+        "border-color": selectionBorderColor,
       })
       .selector("edge")
       .style({
@@ -561,10 +630,12 @@ document.addEventListener("DOMContentLoaded", () => {
   applyTheme();
 
   /*
-   * al-folio가 HTML 또는 body의 class/data-theme를 변경할 때
-   * Cytoscape canvas의 색상도 갱신합니다.
+   * al-folio가 HTML 또는 body의 class/data-theme를 변경하면
+   * Cytoscape 색상도 다시 계산합니다.
    */
-  const themeObserver = new MutationObserver(applyTheme);
+  const themeObserver = new MutationObserver(() => {
+    applyTheme();
+  });
 
   themeObserver.observe(document.documentElement, {
     attributes: true,
@@ -577,8 +648,8 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /*
-   * 사이트가 명시적인 테마 속성을 사용하지 않는 경우를 위해
-   * OS 색상 테마 변경도 감지합니다.
+   * 사이트가 data-theme를 사용하지 않는 경우를 위해
+   * 운영체제 테마 변경도 감지합니다.
    */
   if (typeof darkSchemeQuery.addEventListener === "function") {
     darkSchemeQuery.addEventListener("change", applyTheme);
@@ -589,7 +660,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /*
    * 탭을 벗어나면 물리 연산과 예약된 정지를 중단합니다.
-   * 탭으로 돌아왔을 때 자동으로 재실행하지는 않습니다.
    */
   document.addEventListener("visibilitychange", () => {
     if (!document.hidden) {
@@ -597,16 +667,18 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     window.clearTimeout(stopTimer);
+
+    stagingLayout?.stop();
     physicsLayout?.stop();
   });
 
   /*
    * Reset:
    *
-   * 그래프를 숨기고 노드 위치를 무작위화한 뒤
-   * 애니메이션 없이 다시 배치합니다.
+   * 다시 random 배치한 뒤 viewport를 먼저 고정하고,
+   * Cola 애니메이션을 화면에 표시합니다.
    *
-   * 배치가 끝나면 한 번만 fit하고 최종 상태를 표시합니다.
+   * Cola 종료 후에는 fit하지 않습니다.
    */
   document.getElementById("interest-graph-reset")?.addEventListener("click", () => {
     window.clearTimeout(stopTimer);
@@ -614,15 +686,8 @@ document.addEventListener("DOMContentLoaded", () => {
     cy.elements().unselect();
     cy.elements().removeClass("faded highlighted");
 
-    container.style.visibility = "hidden";
-
-    runPhysics({
-      infinite: false,
-      maxSimulationTime: 1200,
-      randomize: true,
-      animate: false,
-      fitOnStop: true,
-      revealOnStop: true,
+    prepareViewportAndRunPhysics({
+      maxSimulationTime: 1600,
     });
 
     if (description) {
