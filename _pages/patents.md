@@ -9,4 +9,8 @@ nav_order: 3
 
 ## Domestic
 
-### TBD (2026)
+### Application
+
+#### *추후 공개*
+- Application Date: 2026. 08. 04
+- Application No.: *TBD*
