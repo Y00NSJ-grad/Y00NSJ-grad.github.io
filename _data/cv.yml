@@ -104,11 +104,11 @@ cv:
     #     summary: Awarded for outstanding scientific achievement
 
     Publications:
-      - title: (TBD)
+      - title: Selective Aggregation for Quantum Federated Learning with Dynamic QNN Architecture
         authors:
           - Seojin Yoon
           - Soohyun Park
-        publisher: 2026 IEEE International Conference on Quantum Computing and Engineering (QCE)
+        publisher: 2026 IEEE Quantum Week (QCE) Workshop on Quantum Computing and Reinforcement Learning
         releaseDate: 2026-09-18
         # url: TBD
         # summary:
